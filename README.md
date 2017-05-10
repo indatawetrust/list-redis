@@ -1,3 +1,6 @@
+[![Travis Build
+Status](https://img.shields.io/travis/indatawetrust/list-redis-promise.svg)](https://travis-ci.org/indatawetrust/list-redis-promise)
+
 # list-redis
 
   Create a list of hashes sorted by id backend by redis (useful to create queues with data).
@@ -7,14 +10,14 @@
 
 nodejs:
 
-    $ npm install list-redis
+    $ npm install list-redis-promise
     
 
 ## API
 
 ```js
-var list = require('list-redis');
-var queue = list('mylist');
+const list = require('list-redis-promise');
+const queue = list('mylist');
 ```
 
   All functions take either an args Array plus optional callback because operations

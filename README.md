@@ -1,3 +1,6 @@
+[![Travis Build
+Status](https://img.shields.io/travis/indatawetrust/list-redis-promise.svg)](https://travis-ci.org/indatawetrust/list-redis-promise)
+
 # list-redis
 
   Create a list of hashes sorted by id backend by redis (useful to create queues with data).
@@ -7,14 +10,14 @@
 
 nodejs:
 
-    $ npm install list-redis
+    $ npm install list-redis-promise
     
 
 ## API
 
 ```js
-var list = require('list-redis');
-var queue = list('mylist');
+const list = require('list-redis-promise');
+const queue = list('mylist');
 ```
 
   All functions take either an args Array plus optional callback because operations
@@ -27,9 +30,14 @@ var queue = list('mylist');
 ```js
 queue.add({
   name: 'bredele'
-}, function(err, id) {
-  //do something
 })
+.then(id => {
+
+})
+.catch(err => {
+
+})
+
 ```
 
   Hashes are optional:
@@ -45,9 +53,13 @@ queue.add(function(err, id) {
   Get hash by id.
 
 ```js
-queue.get(12, function(err, hash) {
-  //do something
-});
+queue.get(12)
+.then(hash => {
+
+})
+.catch(err => {
+
+})
 ```
 
 ### .has(id, callback)
@@ -55,9 +67,13 @@ queue.get(12, function(err, hash) {
   Return true if list set exists.
 
 ```js
-queue.has(12, function(err, exists) {
-  //do something
-});
+queue.has(12)
+.then(exists => {
+
+})
+.catch(err => {
+
+})
 ```
 
 ### .del(id, callback)
@@ -65,17 +81,25 @@ queue.has(12, function(err, exists) {
   Delete list set.
 
 ```js
-queue.del(12, function(err) {
-  //do something
-});
+queue.del(12)
+.then(() => {
+
+})
+.catch(err => {
+
+})
 ```
 
   Delete list set and hash:
 
  ```js
-queue.del(12, true, function(err) {
-  //do something
-});
+queue.del(12, true)
+.then(() => {
+
+})
+.catch(err => {
+
+})
 ``` 
 
 ### .move(id, list, callback)
@@ -84,7 +108,11 @@ queue.del(12, true, function(err) {
 
 ```js
 var other = list('otherList');
-queue.move(12, other, function(){
-  //do something optional
-});
+queue.move(12, other)
+.then(exists => {
+
+})
+.catch(err => {
+
+})
 ```

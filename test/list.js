@@ -50,13 +50,13 @@ describe('list', function() {
   describe('push', function() {
 
     it('should generate uniq id', function(done) {
-      queue.push(function(err, id) {
+      queue.push().then(id => {
         if(id) done();
       });
     });
 
     it('should push id into a redis queue', function(done) {
-      queue.push(function(err, id) {
+      queue.push().then(id => {
         client.zrank('list:test', id, function(err, res) {
           if(res) done();
         });
@@ -66,7 +66,7 @@ describe('list', function() {
     it('should set options into id hash fields', function(done) {
       queue.push({
         name: 'redis'
-      }, function(err, id) {
+      }).then(id => {
         client.hgetall('list:test:' + id, function(err, res) {
           if(res.name === 'redis') done();
         });
@@ -80,7 +80,7 @@ describe('list', function() {
     it('should return options if exists in list', function(done) {
       queue.push({
         name: 'bredele'
-      }, function(err, id) {
+      }).then(id => {
         queue.get(id, function(err, data) {
           if(!err && data.name === 'bredele') done();
         });
@@ -95,7 +95,7 @@ describe('list', function() {
       // note: it could be great to extend mocha
       // to avoir cascading, a test could depend of an 
       // asynchronous result.
-      queue.push(function(err, id) {
+      queue.push().then(id => {
         queue.del(id).then(err => {
           client.zrank('list:test', id, (err, res) => {
             if(!res) done();
@@ -107,7 +107,7 @@ describe('list', function() {
     it('should delete hash', function(done) {
       queue.push({
         name: 'hello'
-      }, function(err, id) {
+      }).then(id => {
         queue.del(id, true).then(err => {
           client.hgetall('list:test:' + id, function(err, res) {
             if(!res) done();
@@ -120,10 +120,9 @@ describe('list', function() {
   describe('has', function() {
 
     it('should return true if exists', function(done) {
-      queue.push(function(err, id) {
-
+      queue.push().then(id => {
         queue.has(id).then(idx => {
-          if(idx) done();
+          done();
         });
       });
     });
@@ -135,13 +134,12 @@ describe('list', function() {
 
     it('should move set in other list', function(done) {
       var other = list('list:other');
-      queue.push(function(err, id) {
+      queue.push().then(id => {
         queue.move(id, other).then(() => {
           queue.has(id).then(idx => {
             if(!idx) {
-              console.log(idx)
               other.has(id).then(idx => {
-                if(idx) done();
+                done();
               });
             }
           });

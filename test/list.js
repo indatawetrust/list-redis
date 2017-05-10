@@ -9,7 +9,7 @@ var client = require('redis').createClient();
 
 describe('list', function() {
 
-  var queue;
+  let queue;
   beforeEach(function() {
     queue = list('list:test');
   });
@@ -96,8 +96,8 @@ describe('list', function() {
       // to avoir cascading, a test could depend of an 
       // asynchronous result.
       queue.push(function(err, id) {
-        queue.del(id, function(err) {
-          client.zrank('list:test', id, function(err, res) {
+        queue.del(id).then(err => {
+          client.zrank('list:test', id, (err, res) => {
             if(!res) done();
           });
         });
@@ -108,7 +108,7 @@ describe('list', function() {
       queue.push({
         name: 'hello'
       }, function(err, id) {
-        queue.del(id, true, function(err) {
+        queue.del(id, true).then(err => {
           client.hgetall('list:test:' + id, function(err, res) {
             if(!res) done();
           });
@@ -121,7 +121,8 @@ describe('list', function() {
 
     it('should return true if exists', function(done) {
       queue.push(function(err, id) {
-        queue.has(id, function(err, idx) {
+
+        queue.has(id).then(idx => {
           if(idx) done();
         });
       });
@@ -135,10 +136,10 @@ describe('list', function() {
     it('should move set in other list', function(done) {
       var other = list('list:other');
       queue.push(function(err, id) {
-        queue.move(id, other, function() {
-          queue.has(id, function(err, idx) {
+        queue.move(id, other).then(() => {
+          queue.has(id).then(idx => {
             if(!idx) {
-              other.has(id, function(err, idx) {
+              other.has(id).then(idx => {
                 if(idx) done();
               });
             }

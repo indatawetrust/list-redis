@@ -5,7 +5,6 @@
  */
 
 var client = require('redis').createClient;
-var Promise = require('bredele-promise');
 
 
 /**
@@ -47,12 +46,14 @@ function List(name) {
  */
 
 List.prototype.incr = function() {
-  var promise = new Promise();
-  this.client.incr(this.name + ':id', function(err, res) {
-    if(err) promise.reject(err);
-    promise.resolve(res);
-  });
-  return promise;
+
+  return new Promise((resolve, reject) => {
+    this.client.incr(this.name + ':id', function(err, res) {
+      if(err) reject(err);
+      resolve(res);
+    });
+  })
+
 };
 
 
@@ -101,14 +102,14 @@ function is(data, type) {
  */
 
 List.prototype.hmset = function(id, data) {
-  var promise = new Promise();
-  if(is(data,'object')) {
-    this.client.hmset(flatten(this.name, id, data), function(err) {
-      if(err) promise.reject(err);
-      promise.resolve();
-    });
-  }
-  return promise;
+  return new Promise((resolve, reject) => {
+    if(is(data,'object')) {
+      this.client.hmset(flatten(this.name, id, data), function(err) {
+        if(err) reject(err);
+        resolve();
+      });
+    }
+  })
 };
 
 
@@ -146,14 +147,17 @@ List.prototype.add = function(id, cb) {
 
 List.prototype.push = function(data, cb) {
   if(is(data,'function')) cb = data;
-  this.incr()
-    .then(function(id) {
-      // we don't care if hash didn't work
-      this.hmset(id, data);
-      this.add(id, function(err) {
-        cb(err, id);
-      });
-    }.bind(this), cb);
+
+  return new Promise((resolve, reject) => {
+    this.incr()
+      .then(function(id) {
+        // we don't care if hash didn't work
+        this.hmset(id, data);
+        this.add(id, function(err) {
+          cb(err, id);
+        });
+      }.bind(this), cb)
+  })
 };
 
 
@@ -174,18 +178,20 @@ List.prototype.push = function(data, cb) {
  * @api public
  */
 
-List.prototype.del = function(id, cb, fn) {
+List.prototype.del = function(id, cb) {
   var erase = false;
   // NOTE: you could do better than that
   if(is(cb,'boolean')) {
     erase = cb;
-  } else {
-    fn = cb;
   }
-  this.client.zrem(this.name, id, function(err, res) {
-    if(erase) this.client.del(this.name + ':' + id);
-    fn(err, res);
-  }.bind(this));
+
+  return new Promise((resolve, reject) => {
+    this.client.zrem(this.name, id, function(err, res) {
+      if(erase) this.client.del(this.name + ':' + id);
+      if (err) reject(err)
+      resolve(res)
+    }.bind(this));
+  })
 };
 
 
@@ -203,10 +209,13 @@ List.prototype.del = function(id, cb, fn) {
  * @api public
  */
 
-List.prototype.has = function(id, cb) {
-  this.client.zrank(this.name, id, function(err, res) {
-    cb(err, res);
-  });
+List.prototype.has = function(id) {
+  return new Promise((resolve, reject) => {
+    this.client.zrank(this.name, id, function(err, res) {
+      if (err) reject(err)
+      resolve(res)
+    });
+  })
 };
 
 
@@ -255,7 +264,12 @@ List.prototype.hash = function() {
  */
 
 List.prototype.move = function(id, list, cb) {
-  this.del(id, function(err) {
-    if(!err) list.add(id, cb);
-  }.bind(this));
+  const _ = this
+
+  return new Promise((resolve, reject) => {
+    _.del(id).then(res => {
+      if(res) list.add(id, cb)
+      resolve(res)
+    })
+  })
 };

@@ -138,8 +138,10 @@ describe('list', function() {
       queue.push(function(err, id) {
         queue.move(id, other).then(() => {
           queue.has(id).then(idx => {
+            console.log(idx)
             if(!idx) {
               other.has(id).then(idx => {
+                console.log(idx)
                 if(idx) done();
               });
             }

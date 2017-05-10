@@ -23,7 +23,7 @@ const queue = list('mylist');
   All functions take either an args Array plus optional callback because operations
   with redis are asynchronous.
 
-### .add(hash, callback)
+### .push(hash)
 
   Create new hash in list and return its id.
 
@@ -40,7 +40,7 @@ queue.push({
 
 ```
 
-### .get(id, callback)
+### .get(id)
 
   Get hash by id.
 
@@ -54,7 +54,7 @@ queue.get(12)
 })
 ```
 
-### .has(id, callback)
+### .has(id)
 
   Return true if list set exists.
 
@@ -68,7 +68,7 @@ queue.has(12)
 })
 ```
 
-### .del(id, callback)
+### .del(id)
 
   Delete list set.
 
@@ -94,7 +94,7 @@ queue.del(12, true)
 })
 ``` 
 
-### .move(id, list, callback)
+### .move(id, list)
 
   Atomically removes the set of the list stored at source, and pushes the set to the list stored at destination.
 

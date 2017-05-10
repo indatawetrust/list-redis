@@ -139,6 +139,7 @@ describe('list', function() {
         queue.move(id, other).then(() => {
           queue.has(id).then(idx => {
             if(!idx) {
+              console.log(idx)
               other.has(id).then(idx => {
                 if(idx) done();
               });

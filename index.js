@@ -122,7 +122,13 @@ List.prototype.hmset = function(id, data) {
  */
 
 List.prototype.add = function(id, cb) {
-  this.client.zadd(this.name, id, id, cb);
+  return new Promise((resolve, reject) => {
+    this.client.zadd(this.name, id, id, (err, res) => {
+      if (err) reject(err)
+
+      resolve(id) 
+    });
+  })
 };
 
 
@@ -145,18 +151,15 @@ List.prototype.add = function(id, cb) {
  * @api public
  */
 
-List.prototype.push = function(data, cb) {
-  if(is(data,'function')) cb = data;
-
+List.prototype.push = function(data) {
   return new Promise((resolve, reject) => {
     this.incr()
       .then(function(id) {
         // we don't care if hash didn't work
         this.hmset(id, data);
-        this.add(id, function(err) {
-          cb(err, id);
-        });
-      }.bind(this), cb)
+        this.add(id).then(resolve)
+                    .catch(reject)
+      }.bind(this))
   })
 };
 

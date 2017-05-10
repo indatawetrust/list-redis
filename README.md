@@ -28,7 +28,7 @@ const queue = list('mylist');
   Create new hash in list and return its id.
 
 ```js
-queue.add({
+queue.push({
   name: 'bredele'
 })
 .then(id => {
@@ -38,14 +38,6 @@ queue.add({
 
 })
 
-```
-
-  Hashes are optional:
-
-```js
-queue.add(function(err, id) {
-  //do something
-})
 ```
 
 ### .get(id, callback)

@@ -38,9 +38,9 @@ function List(name) {
 
 
 /**
- * Increment id key in order to always 
+ * Increment id key in order to always
  * get a uniq id.
- * 
+ *
  * @return {Promise}
  * @api private
  */
@@ -59,8 +59,8 @@ List.prototype.incr = function() {
 
 /**
  * Flatten object.
- *   
- * @param  {Object} obj 
+ *
+ * @param  {Object} obj
  * @return {Array}
  * @api private
  */
@@ -76,9 +76,9 @@ function flatten(name, id, obj) {
 
 /**
  * Is type of.
- * 
- * @param  {Any}  data 
- * @param  {String}  type 
+ *
+ * @param  {Any}  data
+ * @param  {String}  type
  * @return {Boolean}
  * @api private
  */
@@ -91,13 +91,13 @@ function is(data, type) {
 
 /**
  * Hash options into hash keys
- * 
- * Hashes are identified with the 
- * list name suffixed by ':' and 
+ *
+ * Hashes are identified with the
+ * list name suffixed by ':' and
  * the id.
- * 
+ *
  * @param  {Integer} id
- * @param  {Object} data 
+ * @param  {Object} data
  * @api private
  */
 
@@ -115,8 +115,8 @@ List.prototype.hmset = function(id, data) {
 
 /**
  * Add set in list.
- * 
- * @param {Integer}   id 
+ *
+ * @param {Integer}   id
  * @param {Function} cb
  * @api private
  */
@@ -126,7 +126,7 @@ List.prototype.add = function(id, cb) {
     this.client.zadd(this.name, id, id, (err, res) => {
       if (err) reject(err)
 
-      resolve(id) 
+      resolve(id)
     });
   })
 };
@@ -141,11 +141,11 @@ List.prototype.add = function(id, cb) {
  * Examples:
  *
  *  list.push(cb);
- *  
+ *
  *  list.push({
  *    name: 'bredele'
  *  }, cb);
- * 
+ *
  * @param {Object | Function} data
  * @param {Function} cb
  * @api public
@@ -174,7 +174,7 @@ List.prototype.push = function(data) {
  *
  *   list.del(12, cb);
  *   list.del(13, true, cb);
- * 
+ *
  * @param  {Integer}   id [description]
  * @param  {Function | Boolean} cb optional
  * @param  {Function} fn optional
@@ -206,8 +206,8 @@ List.prototype.del = function(id, cb) {
  *   list.has(12, function(err, bool) {
  *     // bool true if exists
  *   });
- *   
- * @param  {Integer}   id 
+ *
+ * @param  {Integer}   id
  * @param  {Function} cb
  * @api public
  */
@@ -231,15 +231,21 @@ List.prototype.has = function(id) {
  * Examples:
  *
  *  list.get(12, cb);
- * 
+ *
  * @param  {Integer} id
  * @param  {Function} cb
  * @api public
  */
 
-List.prototype.get = function(id, cb) {
+List.prototype.get = function(id) {
   //NOTE: should we check if in list?
-  this.client.hgetall(this.name + ':' + id, cb);
+
+  return new Promise((resolve, reject) => {
+    this.client.hgetall(this.name + ':' + id, (err, results) => {
+      if (err) reject(err)
+      resolve(results)
+    });
+  })
 };
 
 
@@ -259,9 +265,9 @@ List.prototype.hash = function() {
  * Examples:
  *
  *   list.move(12, otherList, cb);
- * 
- * @param  {Integer}   id 
- * @param  {List}   list 
+ *
+ * @param  {Integer}   id
+ * @param  {List}   list
  * @param  {Function} cb
  * @api public
  */

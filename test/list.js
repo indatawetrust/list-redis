@@ -72,7 +72,7 @@ describe('list', function() {
         });
       });
     });
-    
+
   });
 
   describe('get', function() {
@@ -81,8 +81,8 @@ describe('list', function() {
       queue.push({
         name: 'bredele'
       }).then(id => {
-        queue.get(id, function(err, data) {
-          if(!err && data.name === 'bredele') done();
+        queue.get(id).then(data => {
+          if(data.name === 'bredele') done();
         });
       });
     });
@@ -90,10 +90,10 @@ describe('list', function() {
   });
 
   describe('del', function() {
-    
+
     it('should remove set from list', function(done) {
       // note: it could be great to extend mocha
-      // to avoir cascading, a test could depend of an 
+      // to avoir cascading, a test could depend of an
       // asynchronous result.
       queue.push().then(id => {
         queue.del(id).then(err => {
@@ -146,6 +146,6 @@ describe('list', function() {
         });
       });
     });
-  
+
   });
 });
